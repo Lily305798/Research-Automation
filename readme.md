@@ -1,28 +1,27 @@
-# Repository Name
+# 🚀 Research & Automation 
 
-This repository contains scripts and resources for various tasks and projects. It is designed to be modular and easy to navigate, with a clear structure for organizing files and directories.
+This repository contains all scripts used or written by **L3l7**. It is designed to have **4 branches**, categorized by script type:  
+- 🛠️ **System Configuration**  
+- 🗡️ **Attacking**  
+- 🛡️ **Defensive**  
+- 🌍 **Exploration**  
 
-## Repository Structure
+The structure will eventually be organized per OS systems and versions if necessary.
+
+## 📂 Repository Structure
 
 ```
 /home/kali/Documents/Scripts/
-├── readme.md          # Documentation for the repository
-├── scripts/           # Directory containing all script files
-├── data/              # Directory for input/output data files
-└── utils/             # Utility scripts or helper functions
+├── 📄 readme.md           # Documentation for the repository
+└── 📝 year_month_name.sh  # Script naming format
 ```
 
-## Contents
+## 📜 Contents
 
-- **readme.md**: This file, providing an overview of the repository.
-- **scripts/**: Contains the main scripts for different tasks or projects.
-- **data/**: Stores datasets, configuration files, or any other resources required by the scripts.
-- **utils/**: Includes reusable utility functions or helper scripts.
+- **📄 readme.md**: Overview of the repository.
 
-## Usage
+## 🧑‍💻 Usage
 
-1. Clone the repository to your local machine.
-2. Navigate to the relevant directory for the task you want to perform.
-3. Follow the instructions in the respective script or documentation.
-
-Feel free to contribute or modify the scripts as needed!
+1. 🖥️ Clone the repository to your local machine.  
+2. 🔍 Pick the script for the task you want to perform.  
+3. ⚠️ Pay attention to the instructions in the respective script or when they show up in the terminal.
