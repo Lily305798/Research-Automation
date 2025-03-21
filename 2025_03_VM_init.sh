@@ -8,7 +8,7 @@
 # Variables
 VSCODE_REPO="https://packages.microsoft.com/repos/code"
 VSCODE_KEY="/usr/share/keyrings/packages.microsoft.gpg"
-LOGFILE="/var/log/2025_03_vm_init.log"
+LOGFILE="/var/log/configscripts/2025_03_vm_init.log"
 exec > >(tee -a "$LOGFILE") 2>&1 # Log all output to respective logfile
 
 # Check if the script is being run as root or with sudo privileges
@@ -49,7 +49,12 @@ update_and_upgrade() {
 # Step 2: Install the necessary packages for the VM
 # VSCode
 install_vscode() {
-    echo "Installing Visual Studio Code..."
+    if command -v code &> /dev/null; then
+        echo "✅ VS Code is already installed. Skipping installation."
+        return 0  # Exit function early
+    fi
+    
+    echo "❌ VS Code is not installed. Installing Visual Studio Code..."
     sudo apt install software-properties-common apt-transport-https wget -y || { echo "Failed to install prerequisites. You got internet ?"; exit 1; }
     wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o "$VSCODE_KEY" || { echo "Failed to download Microsoft GPG key. Check if obsolete ?"; exit 1; }
     echo "deb [arch=amd64 signed-by="$VSCODE_KEY"] "$VSCODE_REPO" stable main" | sudo tee /etc/apt/sources.list.d/vscode.list
@@ -75,4 +80,4 @@ confirm_prompt
 
 update_and_upgrade
 install_vscode
-install_other_tools
+#install_other_tools
