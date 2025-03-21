@@ -53,7 +53,7 @@ install_vscode() {
         echo "✅ VS Code is already installed. Skipping installation."
         return 0  # Exit function early
     fi
-    
+
     echo "❌ VS Code is not installed. Installing Visual Studio Code..."
     sudo apt install software-properties-common apt-transport-https wget -y || { echo "Failed to install prerequisites. You got internet ?"; exit 1; }
     wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o "$VSCODE_KEY" || { echo "Failed to download Microsoft GPG key. Check if obsolete ?"; exit 1; }
@@ -65,14 +65,51 @@ install_vscode() {
 # Enum4linux, Gobuster, Nmap, OpenVPN, Python3, Python3-pip, Python3-venv, Wget, Wireshark, Zsh... for a start
 install_other_tools() {
     echo "Installing the additional tools..."
+
+    # Helper function to check if a tool is installed
+    is_installed() {
+        dpkg -l | grep -qw "$1"
+    }
+
     # Enumeration and Scanning
-    sudo apt install enum4linux gobuster nmap -y || { echo "Failed to install one of the enumeration and scanning tools."; exit 1; }
+    for tool in enum4linux gobuster nmap; do
+        if is_installed "$tool"; then
+            echo "✅ $tool is already installed. Skipping."
+        else
+            echo "❌ $tool is not installed. Installing..."
+            sudo apt install "$tool" -y || { echo "Failed to install $tool."; exit 1; }
+        fi
+    done
+
     # Networking and VPN
-    sudo apt install openvpn wireshark -y || { echo "Failed to install one of the networking and VPN tools."; exit 1; }
+    for tool in openvpn wireshark; do
+        if is_installed "$tool"; then
+            echo "✅ $tool is already installed. Skipping."
+        else
+            echo "❌ $tool is not installed. Installing..."
+            sudo apt install "$tool" -y || { echo "Failed to install $tool."; exit 1; }
+        fi
+    done
+
     # Programming and Development
-    sudo apt install python3 python3-pip python3-venv -y || { echo "Failed to install one of the programming and development tools."; exit 1; }
+    for tool in python3 python3-pip python3-venv; do
+        if is_installed "$tool"; then
+            echo "✅ $tool is already installed. Skipping."
+        else
+            echo "❌ $tool is not installed. Installing..."
+            sudo apt install "$tool" -y || { echo "Failed to install $tool."; exit 1; }
+        fi
+    done
+
     # System Utilities
-    sudo apt install wget zsh -y || { echo "Failed to install one of the system utilities tools."; exit 1; }
+    for tool in wget zsh; do
+        if is_installed "$tool"; then
+            echo "✅ $tool is already installed. Skipping."
+        else
+            echo "❌ $tool is not installed. Installing..."
+            sudo apt install "$tool" -y || { echo "Failed to install $tool."; exit 1; }
+        fi
+    done
 }
 
 check_privis
@@ -80,4 +117,4 @@ confirm_prompt
 
 update_and_upgrade
 install_vscode
-#install_other_tools
+install_other_tools
