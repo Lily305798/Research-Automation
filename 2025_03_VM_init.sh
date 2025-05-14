@@ -72,7 +72,7 @@ install_other_tools() {
     }
 
     # Enumeration and Scanning
-    for tool in enum4linux gobuster nmap; do
+    for tool in enum4linux gobuster nmap ncat; do
         if is_installed "$tool"; then
             echo "✅ $tool is already installed. Skipping."
         else
