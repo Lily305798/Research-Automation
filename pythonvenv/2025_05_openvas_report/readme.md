@@ -9,6 +9,7 @@ This project provides a Python-based interface for interacting with the OpenVAS 
 ## Directory Structure
 ```
 openvas-network-scan
+├── [venv]
 ├── src
 │   ├── main.py          # Entry point of the application
 │   ├── openvas
@@ -28,11 +29,15 @@ openvas-network-scan
 1. Clone the repository:
    ```
    git clone <repository-url>
-   cd openvas-network-scan
+   cd 2025_05_openvas_report
    ```
 
 2. Install the required dependencies:
    ```
+   python3 -m venv 2025_05_openvas_report/venv
+
+   source venv/bin/activate
+
    pip install -r requirements.txt
    ```
 
@@ -46,6 +51,3 @@ python src/main.py
 
 ## Contributing
 Contributions are welcome! Please submit a pull request or open an issue for discussion.
-
-## License
-This project is licensed under the MIT License. See the LICENSE file for details.

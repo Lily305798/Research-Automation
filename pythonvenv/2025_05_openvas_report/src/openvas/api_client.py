@@ -1,35 +1,41 @@
+# File: /2025_05_openvas_report/src/openvas/api_client.py
+
+from gvm.connections import UnixSocketConnection
+from gvm.protocols.gmp import Gmp
+from gvm.errors import GvmError
+
 class ApiClient:
-    def __init__(self, base_url, username, password):
-        self.base_url = base_url
+    def __init__(self, socket_path='/run/gvmd/gvmd.sock', username='', password=''):
+        self.socket_path = socket_path
         self.username = username
         self.password = password
-        self.session = None
+        self.connection = None
+        self.gmp = None
 
     def authenticate(self):
-        # Implement authentication logic here
-        """Authenticate with the OpenVAS API and store the token."""
-        url = f"{self.base_url}/login"
-        payload = {"username": self.username, "password": self.password}
-        response = requests.post(url, json=payload)
-
-        if response.status_code == 200:
-            self.token = response.json().get("token")
+        """Establish connection to GMP and authenticate user."""
+        try:
+            self.connection = UnixSocketConnection(path=self.socket_path)
+            self.gmp = Gmp(self.connection)
+            self.gmp.authenticate(self.username, self.password)
+            print("[+] Authenticated with gvmd successfully.")
             return True
-        return False
+        except GvmError as e:
+            print(f"[!] GMP Authentication error: {e}")
+            return False
 
-    def send_request(self, endpoint, method='GET', data=None):
-        # Implement request sending logic here
-        """Send an HTTP request to the OpenVAS API."""
-        headers = {"Authorization": f"Bearer {self.token}"} if self.token else {}
-        url = f"{self.base_url}{endpoint}"
-        response = requests.request(method, url, headers=headers, json=data)
-        return response
+    def send_command(self, command, **kwargs):
+        """Send a GMP command via the Gmp client."""
+        try:
+            func = getattr(self.gmp, command)
+            response = func(**kwargs)
+            return response
+        except AttributeError:
+            print(f"[!] Command {command} not found in GMP client.")
+        except GvmError as e:
+            print(f"[!] GMP error while sending command: {e}")
 
-    def receive_response(self, response):
-        # Implement response handling logic here
-        """Process the response from the OpenVAS API."""
-        if response.status_code == 200:
-            return response.json()
-        response.raise_for_status()
-
-    # Additional methods for API interaction can be added here
+    def close(self):
+        """Close the connection cleanly."""
+        if self.connection:
+            self.connection.close()
