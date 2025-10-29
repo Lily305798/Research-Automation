@@ -9,7 +9,6 @@ This project provides a Python-based interface for interacting with the OpenVAS 
 ## Directory Structure
 ```
 openvas-network-scan
-├── [venv]
 ├── src
 │   ├── main.py          # Entry point of the application
 │   ├── openvas

@@ -5,7 +5,7 @@ from gvm.protocols.gmp import Gmp
 from gvm.errors import GvmError
 
 class ApiClient:
-    def __init__(self, socket_path='/run/gvmd/gvmd.sock', username='', password=''):
+    def __init__(self, socket_path='/opt/gvm/gvmd/gvmd.sock', username='admin', password='adminpassword'):
         self.socket_path = socket_path
         self.username = username
         self.password = password
