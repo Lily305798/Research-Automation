@@ -1,0 +1,8 @@
+# Dockerfile.scanner
+FROM greenbone/openvas-scanner-build:latest
+
+WORKDIR /opt/gvm
+COPY start-scanner.sh /usr/local/bin/start-scanner.sh
+RUN chmod +x /usr/local/bin/start-scanner.sh
+
+ENTRYPOINT ["/usr/local/bin/start-scanner.sh"]

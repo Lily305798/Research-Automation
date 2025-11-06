@@ -1,0 +1,61 @@
+# Dockerfile.gvmd
+FROM debian:12
+
+# Set environment
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH"
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    pkg-config \
+    libcjson-dev \
+    libcurl4-openssl-dev \
+    libgcrypt-dev \
+    libglib2.0-dev \
+    libgnutls28-dev \
+    libgpgme-dev \
+    libhiredis-dev \
+    libnet1-dev \
+    libpaho-mqtt-dev \
+    libpcap-dev \
+    libssh-dev \
+    libxml2-dev \
+    libldap2-dev \
+    libradcli-dev \
+    git \
+    pkg-config \
+    uuid-dev
+
+# Clone, build, and install gvm-libs
+RUN git clone https://github.com/greenbone/gvm-libs.git /opt/gvm-libs \
+    && mkdir -p /opt/gvm-libs/build \
+    && cd /opt/gvm-libs/build \
+    && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+    && make -j$(nproc) \
+    && make install
+
+
+# Clone, build, and install openvas-scanner
+# RUN git clone https://github.com/greenbone/openvas-scanner.git /opt/openvas-scanner \
+#     && mkdir -p /opt/openvas-scanner/build && cd /opt/openvas-scanner/build \
+#     && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+#     && make -j$(nproc) \
+#     && make install
+
+# Clone, build, and install gvmd
+# RUN git clone https://github.com/greenbone/gvmd.git /opt/gvmd \
+#     && mkdir -p /opt/gvmd/build && cd /opt/gvmd/build \
+#     && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+#     && make -j$(nproc) \
+#     && make install
+
+# Clean up git repositories to reduce image size
+# RUN rm -rf /opt/gvm-libs /opt/openvas-scanner /opt/gvmd
+
+# Expose default GVMD ports
+# EXPOSE 9390 9392
+
+# Set default entrypoint
+# ENTRYPOINT ["/usr/local/sbin/gvmd"]
+
