@@ -1,0 +1,46 @@
+# Start from your working gvm-libs image
+FROM gvm-libs:debian12
+
+# Environment variables recommended by Greenbone
+ENV BUILD_DIR=/opt/openvas-scanner
+
+# Install dependencies for openvas-scanner
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    g++ \
+    make \
+    cmake \
+    pkg-config \
+    git \
+    bison \
+    flex \
+    libssh-gcrypt-dev \
+    libgnutls28-dev \
+    libglib2.0-dev \
+    libjson-glib-dev \
+    libpcap-dev \
+    libgpgme-dev \
+    libksba-dev \
+    libsnmp-dev \
+    libgcrypt20-dev \
+    libbsd-dev \
+    libcurl4-gnutls-dev \
+    krb5-multidev \
+    libmagic-dev \
+    redis-server \
+    && rm -rf /var/lib/apt/lists/*
+
+# Clone and build openvas-scanner
+RUN git clone https://github.com/greenbone/openvas-scanner.git ${BUILD_DIR} \
+    && mkdir -p ${BUILD_DIR}/build \
+    && cd ${BUILD_DIR}/build \
+    && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+    && make -j$(nproc) \
+    && make install
+
+# Scanner runtime directory
+RUN mkdir -p /var/lib/openvas/plugins \
+    && mkdir -p /var/run/ospd \
+    && mkdir -p /usr/local/var/lib/openvas/plugins
+
+CMD ["/bin/bash"]
