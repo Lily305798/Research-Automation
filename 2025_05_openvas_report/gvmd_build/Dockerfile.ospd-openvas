@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libssh-gcrypt-dev \
     libksba-dev \
     libjson-glib-dev \
+    redis-server \
     && rm -rf /var/lib/apt/lists/*
 
 # Create virtual environment for OSPD + OSPD-OpenVAS
@@ -31,10 +32,8 @@ RUN git clone https://github.com/greenbone/ospd.git /opt/ospd \
 RUN git clone https://github.com/greenbone/ospd-openvas.git /opt/ospd-openvas \
     && pip install --no-cache-dir /opt/ospd-openvas
 
-# Expose the UNIX socket path as a volume (optional but recommended)
-VOLUME ["/var/run/ospd"]
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# Default command to run ospd-openvas with the correct socket path
-CMD ["ospd-openvas", \
-     "--unix-socket=/var/run/ospd/ospd-openvas.sock", \
-     "--log-level=INFO"]
+ENTRYPOINT ["/entrypoint.sh"]
+
