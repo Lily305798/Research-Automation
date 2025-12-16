@@ -1,23 +1,26 @@
 #!/bin/bash
 set -e
 
-# Ensure runtime dir exists
-mkdir -p /var/run/ospd
+echo "[+] Preparing runtime directories"
+mkdir -p /var/run/ospd /var/lib/redis
 chmod 755 /var/run/ospd
 
-# Start redis (required for scanner)
+echo "[+] Starting Redis"
 redis-server --daemonize yes
 
-# Verify redis is up
-redis-cli ping
+# Wait for Redis to be ready
+for i in {1..10}; do
+  if redis-cli ping >/dev/null 2>&1; then
+    echo "[+] Redis is ready"
+    break
+  fi
+  sleep 1
+done
 
-# Start ospd-openvas
-exec /usr/local/bin/ospd-openvas \
-    --socket-path=/var/run/ospd/ospd-openvas.sock \
-    --log-file=/var/log/ospd-openvas.log \
-    --log-level=INFO \
-    --pid-file=/var/run/ospd/ospd-openvas.pid \
-    --unix-socket-mode=0o777 \
-    --scanner-ca-file=/usr/local/var/lib/gvm/CA/cacert.pem \
-    --scanner-key-file=/usr/local/var/lib/gvm/private/CA/clientkey.pem \
-    --scanner-cert-file=/usr/local/var/lib/gvm/CA/clientcert.pem
+echo "[+] Starting ospd-openvas"
+exec /opt/ospd-venv/bin/ospd-openvas \
+  --socket-path=/var/run/ospd/ospd-openvas.sock \
+  --log-file=/var/log/ospd-openvas.log \
+  --log-level=INFO \
+  --pid-file=/var/run/ospd/ospd-openvas.pid \
+  --unix-socket-mode=0o777
