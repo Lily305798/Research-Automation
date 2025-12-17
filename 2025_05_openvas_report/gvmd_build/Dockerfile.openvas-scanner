@@ -1,18 +1,21 @@
-# Start from your working gvm-libs image
 FROM gvm-libs:debian12
 
-ENV BUILD_DIR=/opt/openvas-scanner
-ENV FEED_DIR=/var/lib/openvas/plugins
+ENV DEBIAN_FRONTEND=noninteractive
 
 # -------------------------------------------------------
-# 1) Install dependencies for OpenVAS Scanner + Feed Sync
+# Install OpenVAS scanner dependencies
 # -------------------------------------------------------
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc g++ make cmake pkg-config git \
-    bison flex \
-    python3 python3-pip python3-venv \
     redis-server \
-    libssh-gcrypt-dev \
+    gcc \
+    g++ \
+    make \
+    cmake \
+    pkg-config \
+    git \
+    bison \
+    flex \
+    libssh-dev \
     libgnutls28-dev \
     libglib2.0-dev \
     libjson-glib-dev \
@@ -25,44 +28,33 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libcurl4-gnutls-dev \
     krb5-multidev \
     libmagic-dev \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # -------------------------------------------------------
-# 2) Build and install openvas-scanner
+# Build openvas-scanner
 # -------------------------------------------------------
-RUN git clone https://github.com/greenbone/openvas-scanner.git ${BUILD_DIR} \
-    && mkdir -p ${BUILD_DIR}/build \
-    && cd ${BUILD_DIR}/build \
+WORKDIR /opt
+
+RUN git clone https://github.com/greenbone/openvas-scanner.git \
+    && mkdir openvas-scanner/build \
+    && cd openvas-scanner/build \
     && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
     && make -j$(nproc) \
     && make install
 
 # -------------------------------------------------------
-# 3) Install greenbone-feed-sync from gvm-tools repo
+# Runtime directories
 # -------------------------------------------------------
-# Create a Python virtual environment and install gvm-tools safely
-RUN python3 -m venv /opt/gvmpy \
-    && /opt/gvmpy/bin/pip install --no-cache-dir --upgrade pip \
-    && git clone https://github.com/greenbone/gvm-tools.git /opt/gvm-tools \
-    && /opt/gvmpy/bin/pip install --no-cache-dir /opt/gvm-tools
-
-# Add venv to PATH so "greenbone-feed-sync" becomes available
-ENV PATH="/opt/gvmpy/bin:${PATH}"
-
+RUN mkdir -p \
+    /var/run/openvas \
+    /var/lib/openvas/plugins \
+    /usr/local/var/lib/openvas/plugins
 
 # -------------------------------------------------------
-# 4) Create directories required by scanner + OSPD
+# Entrypoint
 # -------------------------------------------------------
-RUN mkdir -p /var/lib/openvas/plugins \
-    && mkdir -p /usr/local/var/lib/openvas/plugins \
-    && mkdir -p /var/run/ospd \
-    && chmod 777 /var/run/ospd
-
-# -------------------------------------------------------
-# 5) Add entrypoint script for future orchestration
-# -------------------------------------------------------
-COPY entrypoint.sh /entrypoint.sh
+COPY entrypoint.openvas-scanner.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["bash"]

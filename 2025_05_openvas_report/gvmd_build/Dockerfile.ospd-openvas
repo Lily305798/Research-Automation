@@ -34,7 +34,7 @@ RUN git clone https://github.com/greenbone/ospd.git /opt/ospd \
 RUN git clone https://github.com/greenbone/ospd-openvas.git /opt/ospd-openvas \
     && pip install --no-cache-dir /opt/ospd-openvas
 
-COPY entrypoint.sh /entrypoint.sh
+COPY entrypoint.ospd-openvas.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]

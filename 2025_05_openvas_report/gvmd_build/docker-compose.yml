@@ -1,47 +1,28 @@
-
 services:
   openvas-scanner:
     build:
       context: .
       dockerfile: Dockerfile.openvas-scanner
     container_name: openvas-scanner
-    restart: unless-stopped
-    networks:
-      - gvm
     volumes:
-      # plugin directory (NVTs)
-      - openvas_plugins:/usr/local/var/lib/openvas/plugins
-      # runtime socket directory (shared with ospd)
-      - ospd_socket:/var/run/ospd
+      - openvas_run:/var/run/openvas
+      - openvas_plugins:/var/lib/openvas
+    restart: unless-stopped
 
   ospd-openvas:
     build:
       context: .
       dockerfile: Dockerfile.ospd-openvas
     container_name: ospd-openvas
-    restart: unless-stopped
-    networks:
-      - gvm
+    volumes:
+      - openvas_run:/var/run/openvas
+      - ospd_run:/var/run/ospd
+      - openvas_plugins:/var/lib/openvas
     depends_on:
       - openvas-scanner
-    volumes:
-      # same plugin directory as scanner
-      - openvas_plugins:/usr/local/var/lib/openvas/plugins
-      # UNIX socket for communication with gvmd (later)
-      - ospd_socket:/var/run/ospd
-      # gvmd certificates (not required yet but mounted for correctness)
-      - gvmd_certs:/usr/local/var/lib/gvm
-    # ospd needs privileges to create unix sockets
-    security_opt:
-      - no-new-privileges:false
-    cap_add:
-      - NET_RAW
-      - NET_ADMIN
-
-networks:
-  gvm:
+    restart: unless-stopped
 
 volumes:
+  openvas_run:
+  ospd_run:
   openvas_plugins:
-  ospd_socket:
-  gvmd_certs:
