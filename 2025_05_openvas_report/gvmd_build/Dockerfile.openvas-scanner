@@ -51,6 +51,11 @@ RUN mkdir -p \
     /var/lib/openvas/plugins \
     /usr/local/var/lib/openvas/plugins
 
+    # Ensure runtime linker can find gvm-libs
+RUN echo "/usr/local/lib" > /etc/ld.so.conf.d/gvm.conf \
+    && ldconfig
+
+
 # -------------------------------------------------------
 # Entrypoint
 # -------------------------------------------------------

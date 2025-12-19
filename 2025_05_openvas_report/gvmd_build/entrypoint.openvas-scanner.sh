@@ -13,6 +13,4 @@ echo "[+] Redis is ready"
 
 echo "[+] Starting openvas-scanner"
 
-exec openvas \
-  --foreground \
-  --unix-socket=/var/run/openvas/openvas.sock
+exec openvas
