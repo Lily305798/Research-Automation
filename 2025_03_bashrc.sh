@@ -10,7 +10,7 @@ HOME="/home/kali"
 BASHRC_FILE="$HOME/.bashrc"
 TIMESTAMP_PROMPT='PS1="[\[\033[0;32m\]\u@\h \[\033[0;36m\]\w \[\033[0;33m\]\$(date +%Y-%m-%d\ %H:%M:%S)\[\033[0m\]]\$ "'
 LOGFILE="/var/log/configscripts/2025_03_bashrc.log"
-RECORDING_FILE="/var/log/configscripts/terminal_session_$(date +%Y%m%d_%H%M%S)_bashrc.log"
+PS1="[\u@\h \w \$(date +%Y-%m-%d %H:%M:%S)]\$ "
 
 
 exec > >(tee -a "$LOGFILE") 2>&1 # Log all output to respective logfile
@@ -32,7 +32,7 @@ confirm_prompt() { # Confirmation prompt
     fi
 }
 
-# Step 1: Modify .bashrc file to user needs
+#Step 1 : Modify .bashrc file to user needs
 
 modify_bashrc() {
     if grep -q "PS1=.*date" "$BASHRC_FILE"; then
@@ -46,20 +46,58 @@ modify_bashrc() {
     fi
 }
 
-# Step 2: Start terminal session recording if needed
-start_terminal_recorder() {
-    echo "Starting terminal session recording..."
-    echo "All terminal activity will be recorded in: $RECORDING_FILE"
-    echo "To stop recording, type 'exit' or press Ctrl+D."
+#Step 2 : Offer to source .bashrc file to apply changes immediately
 
-    # Using the terminal session recorder Script
-    script -q "$RECORDING_FILE"
+source_bashrc() {
+    read -p "This script can source the .bashrc file to apply changes immediately. Do you want to source it now? (Y/n): " user_input
+    user_input=${user_input,,} # Conversion to lowercase
+    if [[ "$user_input" == "y" ]]; then
+        echo "Sourcing .bashrc file..."
+        source "$BASHRC_FILE"
+        echo "Bashrc file sourced successfully."
+        check_locale_prompt
+    else
+        echo "Skipping sourcing of .bashrc file."
+    fi
 }
 
+#Step 3 : Check if date and time are displayed in prompt according to user's locale settings
+
+check_locale_prompt() {
+    echo ""
+    echo "=== Prompt Configuration Preview ==="
+    echo "Your prompt should now display like this:"
+    echo "[user@host /path YYYY-MM-DD HH:MM:SS]\$"
+    echo ""
+    echo "Current timezone:"
+    timedatectl | grep "Time zone"
+    echo ""
+    read -p "Do you want to adjust the timezone? (Y/n): " user_input
+    user_input=${user_input,,}
+    
+    if [[ "$user_input" == "y" ]]; then
+        echo ""
+        echo "Available timezones (showing first 20):"
+        timedatectl list-timezones | head -20
+        echo "... (use 'timedatectl list-timezones' to see all)"
+        echo ""
+        read -p "Enter the timezone you want to set (e.g., Europe/Paris, Asia/Shanghai): " timezone
+        
+        if timedatectl set-timezone "$timezone" 2>/dev/null; then
+            echo "Timezone successfully set to: $timezone"
+            timedatectl | grep "Time zone"
+        else
+            echo "Error: Invalid timezone '$timezone'. Please use 'timedatectl list-timezones' to find valid options."
+        fi
+    else
+        echo "Skipping timezone adjustment."
+    fi
+}
 
 
 check_privis
 confirm_prompt
 
 modify_bashrc
-start_terminal_recorder
+source_bashrc
+

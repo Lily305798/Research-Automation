@@ -1,2 +1,0 @@
-requests
-openvas_lib
