@@ -42,8 +42,9 @@ fi
 
 # --- Start libvirt stack in correct order ---
 echo "Starting libvirt services..."
-systemctl restart virtlogd
-systemctl restart libvirtd
+systemctl restart virtlogd.socket
+systemctl restart libvirtd.socket
+systemctl restart libvirtd-ro.socket
 
 # --- Verification ---
 echo "Verifying libvirt..."
