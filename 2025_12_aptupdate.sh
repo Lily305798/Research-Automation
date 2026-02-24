@@ -5,6 +5,10 @@
 # Date: December 12, 2025
 # Usage: Run this script as root or with sudo privileges.
 
+LOGFILE="/var/log/configscripts/2025_12_aptupdate.log"
+
+exec > >(tee -a "$LOGFILE") 2>&1 # Log all output to respective logfile
+
 # Check if the script is being run as root or with sudo privileges
 check_privis() {
     if [ "$EUID" -ne 0 ]; then
@@ -26,7 +30,7 @@ confirm_prompt() {
 # Step: Update and upgrade the system
 update_and_upgrade() {  
     echo "Updating and upgrading the system..."
-    apt update && apt upgrade -y && apt autoremove -y && apt clean
+    apt-get update && apt-get upgrade -y && apt-get autoremove -y && apt-get clean
 }
 
 check_privis
