@@ -5,7 +5,8 @@ echo "Switching system to Docker mode (Debian 12)"
 
 # --- Stop libvirt stack ---
 echo "Stopping libvirt services..."
-systemctl stop libvirtd virtlogd virtlockd 2>/dev/null || true
+systemctl stop libvirtd.socket libvirtd-ro.socket virtlogd.socket virtlockd.socket 2>/dev/null || true
+
 
 # --- Start Docker stack ---
 echo "Starting Docker services..."
