@@ -1,3 +1,5 @@
 .venv/
+.env
 *.sem
 2025_05_openvas_report/pentest-greenbone/volumes/
+2025_05_openvas_report/pentest-greenbone/context.md
