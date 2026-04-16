@@ -1,0 +1,30 @@
+services:
+  redis-server:
+    image: redis:7-alpine  # Lightweight official image
+    user: "redis:1001"     # Running with GID 1001 to match 'gvm' group
+    volumes:
+      - redis_socket:/run/redis
+      - ./redis.conf:/usr/local/etc/redis/redis.conf # Bringing in custom config file
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+
+  scanner:
+    build: ../pentest-greenbone/builder-runner
+    Dockerfile: Dockerfile
+    volumes:
+      - redis_socket:/run/redis
+      - ospd_socket:/run/ospd
+      - ./volumes/openvas:/var/lib/openvas:rw # Persistent data volume
+    depends_on:
+      - redis-server
+    
+    python-app:
+      build:
+        context: ../pentest-python-pipeline
+      volumes:
+        - ospd_socket:/run/ospd
+      depends_on:
+        - scanner
+
+volumes:
+  redis_socket: # "bridge" for the Unix socket
+  ospd-socket: # "bridge"for the Python <-> Scanner communication
