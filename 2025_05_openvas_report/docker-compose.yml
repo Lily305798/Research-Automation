@@ -1,15 +1,25 @@
 services:
+  init-redis:
+    image: redis:7-alpine
+    user: "root"
+    volumes:
+      - redis_socket:/run/redis
+    command: ["chown", "-R", "999:1001", "/run/redis"]
   redis-server:
     image: redis:7-alpine  # Lightweight official image
     user: "redis:1001"     # Running with GID 1001 to match 'gvm' group
     volumes:
       - redis_socket:/run/redis
-      - ./redis.conf:/usr/local/etc/redis/redis.conf # Bringing in custom config file
+      - ./pentest-greenbone/redis.conf:/usr/local/etc/redis/redis.conf # Bringing in custom config file
+    depends_on:
+      init-redis:
+        condition: service_completed_successfully
     command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
 
   scanner:
-    build: ../pentest-greenbone/builder-runner
-    Dockerfile: Dockerfile
+    build: 
+      context: pentest-greenbone/builder-runner
+      dockerfile: Dockerfile
     volumes:
       - redis_socket:/run/redis
       - ospd_socket:/run/ospd
@@ -17,14 +27,14 @@ services:
     depends_on:
       - redis-server
     
-    python-app:
-      build:
-        context: ../pentest-python-pipeline
-      volumes:
-        - ospd_socket:/run/ospd
-      depends_on:
-        - scanner
+  python-app:
+    build:
+      context: pentest-python-pipeline
+    volumes:
+      - ospd_socket:/run/ospd
+    depends_on:
+      - scanner
 
 volumes:
   redis_socket: # "bridge" for the Unix socket
-  ospd-socket: # "bridge"for the Python <-> Scanner communication
+  ospd_socket: # "bridge"for the Python <-> Scanner communication
