@@ -5,6 +5,10 @@ services:
     volumes:
       - redis_socket:/run/redis
     command: ["chown", "-R", "999:1001", "/run/redis"]
+  mqtt-broker:
+    image: eclipse-mosquitto:2
+    volumes:
+      - ./pentest-greenbone/mosquitto.conf:/mosquitto/config/mosquitto.conf
   redis-server:
     image: redis:7-alpine  # Lightweight official image
     user: "redis:1001"     # Running with GID 1001 to match 'gvm' group
