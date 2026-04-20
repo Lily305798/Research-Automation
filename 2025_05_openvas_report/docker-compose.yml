@@ -24,10 +24,14 @@ services:
     build: 
       context: pentest-greenbone/builder-runner
       dockerfile: Dockerfile
+    environment:
+      - GREENBONE_FEED_SYNC_FEED_RELEASE=22.04
     volumes:
       - redis_socket:/run/redis
       - ospd_socket:/run/ospd
-      - ./volumes/openvas:/var/lib/openvas:rw # Persistent data volume
+      - ./pentest-greenbone/volumes/openvas:/var/lib/openvas:rw # Persistent data volume
+      - ./pentest-greenbone/volumes/notus:/var/lib/notus:rw # Persistent data volume
+      - ./pentest-greenbone/volumes/gvm:/var/lib/gvm:rw # Persistent data volume
     depends_on:
       - redis-server
     
