@@ -26,10 +26,12 @@ services:
       dockerfile: Dockerfile
     environment:
       - GREENBONE_FEED_SYNC_FEED_RELEASE=22.04
+      - GNUPGHOME=/var/lib/openvas/gnupg
     volumes:
       - redis_socket:/run/redis
       - ospd_socket:/run/ospd
       - ./pentest-greenbone/volumes/openvas:/var/lib/openvas:rw # Persistent data volume
+      - ./pentest-greenbone/volumes/openvas/gnupg:/var/lib/openvas/gnupg:rw # Persistent data volume
       - ./pentest-greenbone/volumes/notus:/var/lib/notus:rw # Persistent data volume
       - ./pentest-greenbone/volumes/gvm:/var/lib/gvm:rw # Persistent data volume
     depends_on:
