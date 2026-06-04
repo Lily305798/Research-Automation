@@ -21,21 +21,25 @@ services:
     command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
 
   scanner:
-    build: 
-      context: pentest-greenbone/builder-runner
-      dockerfile: Dockerfile
-    environment:
-      - GREENBONE_FEED_SYNC_FEED_RELEASE=22.04
-      - GNUPGHOME=/var/lib/openvas/gnupg
-    volumes:
-      - redis_socket:/run/redis
-      - ospd_socket:/run/ospd
-      - ./pentest-greenbone/volumes/openvas:/var/lib/openvas:rw # Persistent data volume
-      - ./pentest-greenbone/volumes/openvas/gnupg:/var/lib/openvas/gnupg:rw # Persistent data volume
-      - ./pentest-greenbone/volumes/notus:/var/lib/notus:rw # Persistent data volume
-      - ./pentest-greenbone/volumes/gvm:/var/lib/gvm:rw # Persistent data volume
-    depends_on:
-      - redis-server
+      build: 
+        context: pentest-greenbone/builder-runner
+        dockerfile: Dockerfile
+      user: "0:0" # Forces root execution natively
+      environment:
+        - GREENBONE_FEED_SYNC_FEED_RELEASE=22.04
+        - GNUPGHOME=/var/lib/openvas/gnupg
+      volumes:
+        - redis_socket:/run/redis
+        - ospd_socket:/run/ospd
+        - ./pentest-greenbone/volumes/openvas:/var/lib/openvas:rw
+        - ./pentest-greenbone/volumes/openvas/gnupg:/var/lib/openvas/gnupg:rw
+        - ./pentest-greenbone/volumes/notus:/var/lib/notus:rw
+        - ./pentest-greenbone/volumes/gvm:/var/lib/gvm:rw
+      cap_add:
+        - NET_ADMIN
+        - NET_RAW
+      depends_on:
+        - redis-server
     
   python-app:
     build:
